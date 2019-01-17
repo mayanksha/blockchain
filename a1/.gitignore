@@ -1,0 +1,5 @@
+*.o
+tests/*.dat
+readchain
+cryptotest
+readindexed
