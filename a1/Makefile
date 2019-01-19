@@ -1,9 +1,9 @@
 all:    readchain cryptotest
 
 ifeq ($(DEBUG),1)
-    CPPFLAGS:=-Wall -Werror -g -std=c++14
-else
     CPPFLAGS:=-Wall -Werror -O3 -std=c++14
+else
+    CPPFLAGS:=-Wall -Werror -g -std=c++14
 endif
 
 all: readchain cryptotest
