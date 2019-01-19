@@ -1,4 +1,5 @@
 *.o
+!helper.o
 tests/*.dat
 readchain
 cryptotest
