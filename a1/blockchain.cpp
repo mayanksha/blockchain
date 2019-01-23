@@ -8,6 +8,7 @@ block_t::block_t()
 	, length(1)
 		, prev_block(NULL)
 {
+	/*printf("[Constructor_%s] trsize = %ld", __func__, transactions.size());*/
 	reset_balances();
 }
 
@@ -17,6 +18,7 @@ block_t::block_t(std::shared_ptr<block_t> prev)
 	, prev_hash(prev->blk_hash)
 		, prev_block(prev)
 {
+	/*printf("[Constructor_%s] trsize = %ld", __func__, transactions.size());*/
 	reset_balances();
 }
 
@@ -53,31 +55,90 @@ void block_t::set_hash()
 	compute_block_hash(blk_hash);
 }
 
+
+bool validate_block_helper(
+		std::vector< std::shared_ptr<txn_t> >& transactions,
+		balance_map_t& balances,
+		hash_result_t& prev_hash,
+		hash_result_t& reward_addr,
+		hash_result_t& blk_hash,
+		const uint64_t BLOCK_REWARD
+		);
+
 bool block_t::validate()
 {
-	// create balances array.
+#if DEBUG
+	printf("[Block_%s], Start BLOCK VALIDATION\n", __func__);
+#endif
 	reset_balances();
-	uint8_t verify_block_hash[SHA256_DIGEST_LENGTH];
+	std::vector< std::shared_ptr<txn_t> >::iterator it;
+
+
 	SHA256_CTX sha256;
 	SHA256_Init(&sha256);
-	std::vector< std::shared_ptr<txn_t> >::iterator it;
+	hash_result_t verify_block_hash;
 	for(it = transactions.begin(); it != transactions.end(); it++){
-		(*it)->print_txn_hash();
-	}
-	for(it = transactions.begin(); it != transactions.end(); it++){
+		hash_result_t curr_txn_hash;
+		#if DEBUG
+		for(auto i: balances){
+			if (i.second)
+				std::cout << i.first << "\t" << i.second << std::endl;
+		}
+		std:: cout << "\t\tSource = ";
+		std:: cout << "\t\t" << (*balances.find((*it)->source_addr)).first << std::endl;
+		std:: cout << "\t\tDest = ";
+		std:: cout << "\t\t" << (*balances.find((*it)->dest_addr)).first << std::endl;
+		std:: cout << "\t\tChange = ";
+		std:: cout << "\t\t" << (*balances.find((*it)->change_addr)).first << std::endl;
+		std:: cout << "\t\tAmount = " << (*it)->amount << std::endl;
+		#endif
 		if ((*it)->validate() == true){
 			(*it)->update_balances(balances);
 		}
-		SHA256_Update(&sha256, (*it)->tx_hash.data(), (*it)->size());
-	}
-	SHA256_Final(verify_block_hash, &sha256);
+		// Calculate the txn hash of the currently processed transaction
+    SHA256_CTX sha256_2;
+    SHA256_Init(&sha256_2);
+    SHA256_Update(&sha256_2, (*it)->public_key.data(), (*it)->public_key.size());
+    SHA256_Update(&sha256_2, (*it)->source_addr.data(), (*it)->source_addr.size());
+    SHA256_Update(&sha256_2, (*it)->dest_addr.data(), (*it)->dest_addr.size());
+    SHA256_Update(&sha256_2, (*it)->change_addr.data(), (*it)->change_addr.size());
+    SHA256_Update(&sha256_2, &((*it)->amount), sizeof((*it)->amount));
+    SHA256_Final(const_cast<uint8_t*>(curr_txn_hash.data()), &sha256_2);
 
-	if (blk_hash == verify_block_hash){
-		auto reward_person = balances.find(reward_addr);
-		reward_person->second += BLOCK_REWARD;
+		SHA256_Update(&sha256, curr_txn_hash.data(), curr_txn_hash.size());
+	}
+	SHA256_Update(&sha256, reward_addr.data(), reward_addr.size());
+	SHA256_Update(&sha256, prev_hash.data(), prev_hash.size());
+	SHA256_Final(const_cast<uint8_t*>(verify_block_hash.data()), &sha256);
+
+	bool success = (blk_hash == verify_block_hash);
+#if DEBUG
+	printf("[Block_%s], verify_block_hash = %d\n", __func__, success);
+#endif
+	if (success){
+		if (balances.find(reward_addr) == balances.end()){
+			balances[reward_addr] = BLOCK_REWARD;
+		}
+		else balances[reward_addr] += BLOCK_REWARD;
+#if DEBUG
+		std::cout << "[Block_" << __func__ << "], SUCCESS! reward_addr = " << (*balances.find(reward_addr)).first << std::endl;
+#endif
+		/*print_hash_result_t(reward_addr);*/
+#if DEBUG
+		for(auto i : balances){
+			if (i.second)
+				std::cout << i.first << "\t" << i.second << std::endl;
+		}
+#endif
 		return true;
 	}
 	else return false;
+	/* create balances array.
+	 *reset_balances();
+	 * TODO: replace the call to the helper with your own code.
+	 *valid = validate_block_helper(
+	 *            transactions, balances, prev_hash, reward_addr, blk_hash, BLOCK_REWARD);
+	 *return valid;*/
 }
 
 bool block_t::add_transaction(std::shared_ptr<txn_t> tx, bool check_tx)
@@ -92,8 +153,6 @@ bool block_t::add_transaction(std::shared_ptr<txn_t> tx, bool check_tx)
 	if (check_tx) {
 		// update the balances.
 		tx->update_balances(balances);
-		std::cout << "U+ ";
-		tx->print_txn_hash();
 	}
 	// return true if added.
 	return true;
@@ -102,9 +161,19 @@ bool block_t::add_transaction(std::shared_ptr<txn_t> tx, bool check_tx)
 void block_t::reset_balances()
 {
 	if (prev_block) {
+		/*printf("[%s], Prev BLock exists! trsize = %ld\n", __func__, transactions.size());*/
 		balances = prev_block->balances;
 	} else {
+		/*printf("[%s], Prev BLock doesn't exists! trsize = %ld\n", __func__, transactions.size());*/
 		balances.clear();
+	}
+	for(auto i : this->transactions){
+		if (balances.find(i->source_addr) == balances.end())
+			balances[i->source_addr] = 0;
+		if (balances.find(i->dest_addr) == balances.end())
+			balances[i->dest_addr] = 0;
+		if (balances.find(i->change_addr) == balances.end())
+			balances[i->change_addr] = 0;
 	}
 }
 

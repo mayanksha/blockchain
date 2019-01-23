@@ -1,6 +1,8 @@
 *.o
 !helper.o
-tests/*.dat
+!tests/*.dat
 readchain
 cryptotest
 readindexed
+*.swp
+*.swq

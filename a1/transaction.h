@@ -41,8 +41,6 @@ struct txn_t {
     // 2. verify(public_key, tx_sign, tx_hash)
     bool validate();
 
-    // To Print the transaction hash
-    void print_txn_hash() const;
     // check whether balances are available to perform this transaction.
     bool balance_available(const balance_map_t& balances) const;
     void update_balances(balance_map_t& balances) const;
@@ -53,9 +51,9 @@ struct txn_t {
     bool write(std::ostream& out) const;
     // read from file.
     bool read(std::istream& in);
+    void print_txn_hash() const;
     // read from memory buffer.
     size_t read(uint8_t* buffer, size_t bufsz);
-
 };
 
 // output a single transaction.
