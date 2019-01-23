@@ -56,14 +56,14 @@ void block_t::set_hash()
 }
 
 
-bool validate_block_helper(
-		std::vector< std::shared_ptr<txn_t> >& transactions,
-		balance_map_t& balances,
-		hash_result_t& prev_hash,
-		hash_result_t& reward_addr,
-		hash_result_t& blk_hash,
-		const uint64_t BLOCK_REWARD
-		);
+/*bool validate_block_helper(
+ *    std::vector< std::shared_ptr<txn_t> >& transactions,
+ *    balance_map_t& balances,
+ *    hash_result_t& prev_hash,
+ *    hash_result_t& reward_addr,
+ *    hash_result_t& blk_hash,
+ *    const uint64_t BLOCK_REWARD
+ *    );*/
 
 bool block_t::validate()
 {
@@ -167,14 +167,14 @@ void block_t::reset_balances()
 		/*printf("[%s], Prev BLock doesn't exists! trsize = %ld\n", __func__, transactions.size());*/
 		balances.clear();
 	}
-	for(auto i : this->transactions){
-		if (balances.find(i->source_addr) == balances.end())
-			balances[i->source_addr] = 0;
-		if (balances.find(i->dest_addr) == balances.end())
-			balances[i->dest_addr] = 0;
-		if (balances.find(i->change_addr) == balances.end())
-			balances[i->change_addr] = 0;
-	}
+	/*for(auto i : this->transactions){
+	 *  if (balances.find(i->source_addr) == balances.end())
+	 *    balances[i->source_addr] = 0;
+	 *  if (balances.find(i->dest_addr) == balances.end())
+	 *    balances[i->dest_addr] = 0;
+	 *  if (balances.find(i->change_addr) == balances.end())
+	 *    balances[i->change_addr] = 0;
+	 *}*/
 }
 
 size_t block_t::size() const

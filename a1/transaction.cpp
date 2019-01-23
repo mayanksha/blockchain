@@ -121,7 +121,13 @@ bool txn_t::balance_available(const balance_map_t& balances) const
 void txn_t::update_balances(balance_map_t& balances) const
 {
     auto pos = balances.find(source_addr);
-    assert (pos != balances.end());
+    if (pos == balances.end()){
+#if DEBUG
+			printf("[%s], pos == balances.end() FAILED\n", __func__);
+#endif
+			return;
+		}
+    /*assert (pos != balances.end());*/
     if (pos->second < amount)
 		{
 #if DEBUG
@@ -129,15 +135,25 @@ void txn_t::update_balances(balance_map_t& balances) const
 #endif
 			return;
 		}
-    assert (pos->second >= amount);
+    /*assert (pos->second >= amount);*/
 
     // calculate change.
     uint64_t change = pos->second - amount;
-    balances[dest_addr] += amount;
-    balances[change_addr] += change;
+		if (balances.find(dest_addr) == balances.end()){
+			balances[dest_addr] = amount;
+		}
+		else 
+			balances[dest_addr] += amount;
+		if (balances.find(change_addr) == balances.end()){
+			balances[change_addr] = change;
+		}
+		else 
+			balances[dest_addr] += change;
 
+		// Remove the source address from the balance_map
+		balances.erase(pos);
     // source has no more balance.
-    balances[source_addr] = 0;
+    /*balances[source_addr] = 0;*/
 }
 
 size_t txn_t::size() const

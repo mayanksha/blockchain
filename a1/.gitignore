@@ -6,3 +6,11 @@ cryptotest
 readindexed
 *.swp
 *.swq
+
+#These test files are very large!
+# https://web.cse.iitk.ac.in/users/spramod/t4.dat
+# https://web.cse.iitk.ac.in/users/spramod/t5.dat
+# https://web.cse.iitk.ac.in/users/spramod/t6.dat
+tests/t4.dat
+tests/t5.dat
+tests/t6.dat
