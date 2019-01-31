@@ -148,7 +148,7 @@ void txn_t::update_balances(balance_map_t& balances) const
 			balances[change_addr] = change;
 		}
 		else 
-			balances[dest_addr] += change;
+			balances[change_addr] += change;
 
 		// Remove the source address from the balance_map
 		balances.erase(pos);
