@@ -1,7 +1,10 @@
 \section{}
 
 \subsection{Output}
+The code can also be accessed at this link:  \\
+\url{https://github.com/mayanksha/blockchain/blob/master/midterm\_programming/foobar.cpp}\\
 Below code is compiled using 
+
 \begin{lstlisting}[language=bash]
 g++ -Wall -L /usr/local/lib/  -o foobar foobar.cpp -lssl -lcrypto
 \end{lstlisting}
@@ -19,6 +22,7 @@ sQIDAQAB
 SHA-256 Hashed and then Base58 Encoded Public Key = 
 G78Kz4Ra5srKvNr1Fp1dqoEWuqnXaHGZabwKyxcyM2G1
 \end{lstlisting}
+
 \begin{lstlisting}[language=c++]{foobar.cpp}
 #include <iostream>
 #include <cstdio>
@@ -35,51 +39,50 @@ G78Kz4Ra5srKvNr1Fp1dqoEWuqnXaHGZabwKyxcyM2G1
 #include <openssl/sha.h>
 typedef std::vector<uint8_t> uint8_vector_t;
 
-// Reference : https://github.com/bitcoin/bitcoin/blob/master/src/base58.cpp
-// This is take from original source code for bitcoin, it's just a helper function
-static const char* pszBase58 = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
-std::string EncodeBase58(const unsigned char* pbegin, const unsigned char* pend)
+static const char* base_58_chars = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
+// Function to convert vector of bytes to its base58 representation
+std::string EncodeBase58(const std::vector<unsigned char>& vect)
 {
+	const unsigned char* start = &(vect[0]);
+	const unsigned char* end = &(vect[0]) + vect.size() * sizeof(unsigned char);
+	// Allocate enough space in big-endian base58 representation.
+	int size = (end - start) * 138 / 100 + 1; 
 	// Skip & count leading zeroes.
-	int zeroes = 0;
-	int length = 0;
-	while (pbegin != pend && *pbegin == 0) {
-		pbegin++;
+	int zeroes = 0, len = 0;
+	while (start != end && *start == 0) {
+		start++;
 		zeroes++;
 	}
-	// Allocate enough space in big-endian base58 representation.
-	int size = (pend - pbegin) * 138 / 100 + 1; // log(256) / log(58), rounded up.
-	std::vector<unsigned char> b58(size);
-	// Process the bytes.
-	while (pbegin != pend) {
-		int carry = *pbegin;
+	std::vector<unsigned char> base_58_vect(size);
+	while (start != end) {
+		int carry = *start;
 		int i = 0;
-		// Apply "b58 = b58 * 256 + ch".
-		for (std::vector<unsigned char>::reverse_iterator it = b58.rbegin(); (carry != 0 || i < length) && (it != b58.rend()); it++, i++) {
+		// Apply "base_58_vect = base_58_vect * 256 + ch".
+		for (auto it = base_58_vect.rbegin(); (carry != 0 || i < len) && (it != base_58_vect.rend()); it++, i++) {
 			carry += 256 * (*it);
 			*it = carry % 58;
 			carry /= 58;
 		}
-
 		assert(carry == 0);
-		length = i;
-		pbegin++;
+		len = i;
+		start++;
 	}
 	// Skip leading zeroes in base58 result.
-	std::vector<unsigned char>::iterator it = b58.begin() + (size - length);
-	while (it != b58.end() && *it == 0)
+	auto it = base_58_vect.begin() - len + size;
+	while (it != base_58_vect.end() && *it == 0)
 		it++;
-	// Translate the result into a string.
 	std::string str;
-	str.reserve(zeroes + (b58.end() - it));
-	str.assign(zeroes, '1');
-	while (it != b58.end())
-		str += pszBase58[*(it++)];
-	return str;
-}
-std::string EncodeBase58(const std::vector<unsigned char>& vch)
-{
-	return EncodeBase58(vch.data(), vch.data() + vch.size());
+	for(auto i = 0; i < (base_58_vect.end() - it); i++)
+		str.push_back('0');
+	while (it != base_58_vect.end()) {
+		str += base_58_chars[*(it)];
+		it++;
+	}
+	// Remove the starting zeroes from string too
+	auto it2 = str.begin(); 
+	while (it2 != str.end() && *it2 == '0')
+		it2++;
+	return str.substr(it2 - str.begin(), str.end() - it2);
 }
 void setup_context() {
 	ERR_load_crypto_strings();

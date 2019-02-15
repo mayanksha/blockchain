@@ -1,1 +1,6 @@
-\section{}
+\section{Mining Pools}
+The designer can change the hash puzzle problem from "Find the nonce such that the Hash belongs to the target space " to the new hash puzzle "Find the nonce and such that the hash of the digital signature belongs to a certain target space".  \\  \\
+This setting automatically highly discourages a minig pool setup because calculating the digital signature requires the knowledge of private key of pool manager to all the nodes participating in the pool. 
+\\ \\
+Any malicious person can steal the private key and use this to steal the money from the bitcoin wallet to which a block reward payment goes to on successful mining of a block. This way, a mining pool get split into a few trusted nodes only.
+

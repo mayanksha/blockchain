@@ -1,4 +1,5 @@
 \section{}
+\setcounter{equation}{0}
 \subsection{}
 Probability to solve hash-puzzle  $ = p$ \\ 
 Ways to choose $k$ miners out of $n$ = $ \binom{n}{k}$ \\
@@ -7,8 +8,67 @@ For k miners, prob. to solve hash-puzzle simultaneously
 	=& \binom{n}{k} (p)^k (1-p)^{n-k}
 \end{align}
 \subsection{}
-Consider the exponential distribution with Probability density function (pdf)
+Suppose in a certain time interval (t), we make $n$ tries to find a block and out of that only $k$ successes are achieved. The Probability to find a block (i.e. to solve a hash-puzzle) is $p$, and is fixed because the blockchain network changes the difficulty so that this remains constant.
+\\ \\
+Hence, in that time interval, the total number of blocks found out is equal to $\lambda = np$. Now, the distribution of finding a block in a large enough fixed interval follows the Binomial Distribution i.e. (Here, $N_t$ is the number of arrivals in a time interval t)
 \begin{align}
-	\text{pdf} =& \lambda \exp{-\lambda x} 
+	P(N_t = k \mid p, n) = & \binom{n}{k} (p)^k (1-p)^{n-k}
 \end{align}
+For a blockchain, the number $n$ is sufficiently high, so that we can take  \\
+$n \to \infty$ and that $\lambda = np$, so that out $p \to 0$.
+\begin{align}
+	\lim_{n \to \infty} P(N_t = k \mid p, n) 
+	&= \lim_{n \to \infty} \binom{n}{k} (p)^k (1-p)^{n-k} \\
+	&= \lim_{n \to \infty} \binom{n}{k} \left(\frac{\lambda}{n}\right)^k 
+		\left(1-\frac{\lambda}{n}\right)^{n-k} \\
+	&= \frac{\lambda^k e^{-\lambda}}{k !}
+\end{align}
+This is the pmf for Poisson Distribution. \\ \\
+Now consider, \\
+	$X_t: $ The time it takes for mining one additional block assuming that some block was mined successfully at time $t$.
+	By definition of $N_t$, we have
+\begin{align}
+	(X_t > x) \equiv (N_t = N_{t+x})
+\end{align}
+This means that the number of blocks which have arrived upto time $t$ to $t+x$ is equal to $N_t$, or that no new block has been mined between time interval $[t, t+x]$. \\
+Now,
+\begin{align*}
+	P(X_t \leq x) 
+	&= 1 - P(X_t > x)  \\
+	&= 1 - P(N_{t+x} = N_{t}) \\	
+	&= 1 - P(N_{t+x} - N_{t} = 0) \\	
+	&= 1 - P(N_{x} = 0)	
+\end{align}
+The last step takes into fact that no new block was mined in time interval [t, t+x], and hence $N_x = 0$.  \\ \\
+Also, $\lambda$ in Poisson Distribution is the expected number of total arrivals. Take $\alpha$ to be the average number of arrivals per unit time. Hence, for a time interval $x$, we have a total of $\alpha x$ arrivals.
+From (5), we have, 
+\begin{align*}
+	P(X_t \leq x) 
+	&= 1 - 	\frac{(\alpha x)^0 e^{-(\alpha x)}}{0!} \\
+	&= 1 - 	e^{-(\alpha x)} \\
+	X &\sim \exp({x; \alpha})
+\end{align}
+This is the CDF of exponential distribution, with an average time to mine a block of $\alpha$. Hence, the time taken to mine a block in the next $x$ time units has exponenttial distribution. \\
+.\hfill{} \bo{[Q.E.D]}
+\subsection{}
+No, it's not possible to rely upon the timestamp provided by a miner to prioritize his block over someone else's. Due to network delays and congestion, a large amount of delay can generate between the time when a block was generated to the time when it was broadcasted.
+As a result, we can't have time synchronized over the world.
 
+
+\subsection{}
+From part (b), the number of blocks which are mined in a certain time t follows exponential distribution.
+The number of blocks expected to be found in a certain time follows the Poisson distribution.
+
+
+\begin{align*}
+	P(N_t \geq 6)  &= 0.99 \\
+	&= 1 - P(N_t < 6) \\
+	0.99 &= 1 - \sum_{i=0}^{5}P(N_t = i)
+\end{align}
+Now, the parameter $\lambda$ for Poission Distribution is the mean number of blocks expected blocks. For time $x$, we have,
+
+\begin{align*}
+	\sum_{i=0}^{5}P(N_t = i) &=1 - 0.99  \\
+	\sum_{i=0}^{5} \frac{ (\alpha x)^{i} e^{-\alpha x} }{i!} &= 0.01
+\end{align}
+On solving, we get the value of $x \approx 130$ minutes

@@ -19,7 +19,20 @@
 \begin{document}
 %\newcommand{\b}{\textbf}
 \maketitle
-\section{Q}
+\section{}
+Let us consider $H:P \times S \rightarrow \{0,1....,2^n -1\}$ as a collision resistant hash function. Now, using a counter example, we will prove that any general collision resistant function of this form may not be proof of work secure. 
+Let us construct a new hash function $H'$ defined as follows, \\
+$$H': P \times S \rightarrow \{0,1,2...,2^{n'} -1 \}, \qquad \text{ where $n'=n+t$ }$$.\\
+$H'$ is a function whose target space (range) has a total of $2^{n'}$ possible values, hence the target space will be of $n'$ bits. \\
+The output of $H'$ will have $n'$ bits, so we can construct its output using the output of $H$ and another $t$ bits number. We choose that $t$ bit number to have the value $( s \mod 2^t ), s \in S$, where we take the binary representation of the string s.\\
+$$H'=(S \mod 2^t ) \mid H$$\\
+We have assumed that H is collision resistant. Since $H'$ is concatenation of 2 strings, one of them being H, we can easily see that $H'$ will also be collision resistant.\\ 
+If we take the value of $s = 0$, i.e. a string containing only null characters, then $(S \mod 2^t ) = 0$, so effectively the target space of $H'$ in such a setting reduces to $2^n$ values. \\ \\
+
+Hence we are able to find a solution (trivial) $s = 0 \in S$ such that $$H'(p,s) < \frac{2^{n'}}{2^t}$$. 
+This shows that $H'$ is not proof of work secure eve though it is collision resistant.
+
+
 
 \section{Beyond Binary Merkle Trees}
 \subsection{}
@@ -36,18 +49,25 @@ This is because a root node of Merkle Tree indirectly stores the information abo
 \subsection{}
 For finding the Merkle Tree Root node hash, we have to go all the way from leaf node to the root of tree performing hashes. For a $k$-ary tree, we have to go through the height of tree. Hence, the whole operation takes $O(\log_k (n))$ hashes which is the length of the proof.
 \subsection{}
-\bo{DOUBT!}
-For a binary Merkle Tree, we'll need $\log_2(n)$ hashes. The overhead we'll have for a k-ary tree is 
+For a $k$-ary tree, for verifying that some block is a part of the merkle tree, we need to perform a total of 
+$(k-1) \log_k{(n)} $ computations. \\ \\
+Proof: Consider the parent (say A) of a leaf node (say B) of a k-ary tree. We'll be given the hash of the block below it by ther person who's claiming that the block (B) is in Merkle Tree, and then we have to take hashes of all the children of A.  
+\\ 
+So, in total, we'll have to perform (k-1) hashes (since 1 was to be given by the person trying to verify B). At each depth level, we'll have to perform (k-1) hashes to find the hash of the parent node. Hence, $(k-1) \log_k{(n)} $ computations will be needed.
 \begin{align*}
-	&= \frac{\log_k (n)}{\log_2 (n)}  \\
-	&= \log_2 (k)
-\end{align}
-The only advantage we'll have while using a k-ary tree is that  (Smaller or Larger Verification Token?)
-
+	&= \frac{(k-1) \log_k{(n)}} {\log_2{(n)}} \\
+	&= \frac{(k-1)}{\log_2{(k)}} > 1 
+\end{align*}
+The advantage of using a k-ary tree is that at the time of verification, we need to perform only $\log_k{(n)}$ hashes whereas for a binary tree, we'll have to perform $\log_2{(n)}$ hashes. It's a tradeoff between the initial time to perform computations vs the repetitive computations that might be needed in future.
 \section{Hiding vs Binding Components}
-Phone numbers are just 10 digits which corresponds to about 26 bits of \bo{valid} phone numbers. Now, Alice can create his phonebook to contain all the permutations of these valid phone numbers and she'll be able to know which all users are using BobCrypt app. \\ \\
-This way, she can know which all persons use the BobCrypt app.
-
+\subsection{}
+Phone numbers are just 10 digits which corresponds to about 26 bits of \bo{valid} phone numbers. Now, Bob can create a new phonebook which contains all the permutations of these valid phone numbers and she'll be able to know which all users are using BobCrypt app. \\ \\
+This way, he can know which all persons use the BobCrypt app and their contact numbers.
+\subsection{}
+Suppose two different users Alice and Charlie have the same contact (say $X$) in their phonebooks. 
+When the app will hash $X$'s contact, it will generate a different (random) nonce (even for the same contact of $X$), and hence the finally generated hash values for the same contact number ($X$) will be different. 
+\\ \\
+Hence, Bob's server won't be able to achieve the intended functionality of mapping a user's phone to a fixed hash because of this random nonce.
 \section{Bitcoin Script}
 \subsection{}
 ScriptSig :
@@ -62,6 +82,25 @@ So, here Alice can create a P2SH script for herself which saves her password in 
 
 \section{Lightweight Clients}
 \subsection{}
+Alice should be sending all the block headers till the block which contains the last transaction which is put as the input of another transaction that she's trying to verify. 
+\\ \\
+Moreover, Alice also needs to send the merkle root of the block which contains that input transaction. From Bob's perspective, he'll need to use the headers to verify that the transaction is indeed valid.
+\subsection{}
+
+ Number of transactions in a block,
+  $$ n = 256$$
+ Number of blocks before head,
+  $$k  = 8$$
+	Now, each block header is 80 bytes in length, and each SHA-256 hash is 32 bytes. The merkle proof for the last block which contains the transaction takes $\log_2{(n)}$ hashes.
+	\\
+	Hence, total bytes Alice need to send
+	\begin{align*}
+		=& 80 \times k + 32 \times \log_2{(n)}  \\
+		=& 640 + 256 \\
+		=& 896 bytes
+	\end{align*}
+\subsection{}
+
 
 \section{Bitcoin Lotto}
 \subsection{}
