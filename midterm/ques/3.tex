@@ -1,0 +1,9 @@
+\section{}
+The statement \ti{ “In bitcoin blockchain, double-spend attack is never possible” } is false. Double-spending attacks however uncommon can be possible due to the following two reasons:
+
+\begin{itemize}
+	\item For the merchants accepting 0-confimation transactions, a double-spending is highly probable (called race attack). The person (say Alice) paying to the merchant for a service can send a valid transaction to merchant while also sending a conflicting transaction spending the coin to himself to the rest of network. \\ \\
+		Then, any malicious node (which can be controlled by Alice) can cause the correct transaction to not be included in the new block, whereas a double-spending transaction will get processed and be included in the next block by such a node.
+		\item \bo{51 \% attack: } A single large enough node which controls 51\% hash rate of the network can cause his own privately mined fork to grow to a large extent and then publishing his own mined blocks to the main chain.
+			Moreover, since such an entity has large hashing power, he can mine blocks at a much faster rate thereby confirming the double-spending transactions faster than any heahtly node can. The moment of relief is that such an attack is highly improbable.  
+\end{itemize}
