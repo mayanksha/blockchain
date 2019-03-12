@@ -65,8 +65,7 @@ contract("Manager", accounts => {
 			.catch(err => {
 				assert(err instanceof Error);
 			})
-	}
-	);
+	});
 
 	it("addStudent() should add a student with roll Number ", () => {
 		return Manager.deployed()
@@ -405,64 +404,125 @@ contract("Manager", accounts => {
 	}
 	);
 
-it("get the contract addresses of all Course contracts", () => {
-	let instance;
-	return Manager.deployed()
-		.then(inst => {
-			instance = inst;
-		})
-		.then(() => addCoursePromises)
-		.then((arr) => Promise.all(arr))
-		.then((resolves) => {
-			let allPromises = [];
-			for(let i = 730; i <= 732; i++) {
-				allPromises.push(instance.getCourseAddress.call(i));
-			}
-			Promise.all(allPromises)
-				.then(arr => {
-					arr.forEach(e => {
-						courseAddress.push(e);
-						console.log(e);
-					});
-				})
-				.catch(err => { 
-					throw err;
-				})
-		})
-		.catch(err => {
-			throw err;	
-		})
-});
-})
-
-contract("Course", accounts => {
-	let rollCount = 19111000;
-	const owner = accounts[0];
-	const students = {
-		first: accounts[1],
-		second: accounts[2],
-		third: accounts[3],
-	};
-	const instructors = {
-		first: accounts[4],
-		second: accounts[5],
-		third: accounts[6],
-	};
-
-	const outsider = {
-		first: accounts[7],
-		second: accounts[8],
-		third: accounts[9],
-	};
-	const courses = {
-		first: 730,
-		second: 731,
-		third: 732,
-	};
-
-	it("Should log addresses of all Course Contracts", () => async function() {
-		console.log(courseAddress);
+	it("get the contract addresses of all Course contracts", () => {
+		let instance;
+		return Manager.deployed()
+			.then(inst => {
+				instance = inst;
+			})
+			.then(() => addCoursePromises)
+			.then((arr) => Promise.all(arr))
+			.then((resolves) => {
+				let allPromises = [];
+				for(let i = 730; i <= 732; i++) {
+					allPromises.push(instance.getCourseAddress.call(i));
+				}
+				return Promise.all(allPromises);
+			})
+			.then(arr => {
+				arr.forEach(e => {
+					courseAddress.push(e);
+				});
+			})
+			.catch(err => {
+				throw err;	
+			})
 	});
 
 
+
+	// These will be assigned the Course contracts later
+	let course1; 
+	let course2; 
+	let course3;
+
+	it("Should log addresses of all Course Contracts", async function () {
+		course1 = await Course.at(courseAddress[0]);
+		course2 = await Course.at(courseAddress[1]);
+		course3 = await Course.at(courseAddress[2]);
+	});
+
+	it("Mark attendance for first student by student himself for 730 - FAIL", () => {
+		return course1.markAttendance(students.first, {
+			from: students.first
+		}).then(response => {
+				assert(false);
+			})
+			.catch(err => {
+				assert(err instanceof Error);
+			})
+	});
+
+	it("Mark attendance for first student by instructor for 730 - OK", () => {
+		return course1.markAttendance(rollCount, {
+			from: instructors.first
+		}).then(response => { 
+				assert (response != null);
+				return response;
+			})
+			.catch(err => {
+				throw err;
+			})
+	});
+
+	it("Mark attendance for first student by instructor for 730 - OK", () => {
+		return course1.markAttendance(rollCount, {
+			from: instructors.first
+		}).then(response => { 
+				assert (response != null);
+				return response;
+			})
+			.catch(err => {
+				throw err;
+			})
+	});
+	it("Mark attendance for first student by instructor for 730 - OK", () => {
+		return course1.markAttendance(rollCount, {
+			from: instructors.first
+		}).then(response => { 
+				assert (response != null);
+				return response;
+			})
+			.catch(err => {
+				throw err;
+			})
+	});
+	it("Add Midsem Marks for first student by instructor for 730 - OK", () => {
+		return course1.addMidSemMarks(rollCount, 88, {
+			from: instructors.first
+		}).then(response => { 
+				assert (response != null);
+				return response;
+			})
+			.catch(err => {
+				throw err;
+			})
+	});
+	it("Add Endsem Marks for first student by instructor for 730 - OK", () => {
+		return course1.addEndSemMarks(rollCount, 77, {
+			from: instructors.first
+		}).then(response => { 
+				assert (response != null);
+				return response;
+			})
+			.catch(err => {
+				throw err;
+			})
+	});
+
+	it("getMyMarks(rollCount) should be OK", () => {
+		return Manager.deployed()
+			.then((instance) => instance.getMyMarks.call(courses.first, {
+				from: students.first
+			}))
+			.then((val) => {
+				console.log(val);
+				assert((88).toString() === val[0].toString());
+				assert((77).toString() === val[1].toString());
+				assert((3).toString() === val[2].toString());
+			})
+			.catch(err => {
+				throw err;
+			})
+	});
 })
