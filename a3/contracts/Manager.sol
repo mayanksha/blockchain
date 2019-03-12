@@ -8,6 +8,7 @@ contract Manager {
 	mapping (address => int) student;
 	mapping (address => bool) isStudent;
 	mapping (int => bool) isCourse;
+
 	mapping (int => Course) course;
 
 	int rollCount = 19111000;
@@ -16,9 +17,15 @@ contract Manager {
 	constructor() public {
 		admin = msg.sender;
 	}
+
+	// TODO: Remove these later
 	function getAdmin() public accessToAll returns (address) {
 		return admin;
 	}
+	function getCourseAddress(int courseNo) public accessToAll returns (address) {
+		return address(course[courseNo]);
+	}
+
 	// function
 	function kill() public accessToAdminOnly {
 		//The admin has the right to kill the contract at any time.
