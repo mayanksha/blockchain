@@ -16,7 +16,9 @@ contract Manager {
 	constructor() public {
 		admin = msg.sender;
 	}
-
+	function getAdmin() public accessToAll returns (address) {
+		return admin;
+	}
 	// function
 	function kill() public accessToAdminOnly {
 		//The admin has the right to kill the contract at any time.
@@ -32,7 +34,7 @@ contract Manager {
 		require(isStudent[studentAddr] == false);
 		require(student[studentAddr] == 0);
 
-		student[studentAddr] = ++rollCount;
+		student[studentAddr] = rollCount++;
 		isStudent[studentAddr] = true;
 		return;
 	}
@@ -88,7 +90,7 @@ contract Manager {
 		//Returns roll number as int
 		
 		// Check if the student has a roll number or not
-		require(isStudent[msg.sender] != false);
+		require(isStudent[msg.sender] == true);
 		require(student[msg.sender] != 0);
 
 		int rollNo = student[msg.sender];
