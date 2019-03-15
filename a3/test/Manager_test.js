@@ -442,6 +442,21 @@ contract("Manager", accounts => {
 		course3 = await Course.at(courseAddress[2]);
 	});
 
+	it("getMyMarks(rollCount) should return 0, 0, 0 and be OK", () => {
+		return Manager.deployed()
+			.then((instance) => instance.getMyMarks.call(courses.first, {
+				from: students.first
+			}))
+			.then((val) => {
+				console.log(val);
+				assert((0).toString() === val[0].toString());
+				assert((0).toString() === val[1].toString());
+				assert((0).toString() === val[2].toString());
+			})
+			.catch(err => {
+				throw err;
+			})
+	});
 	it("Mark attendance for first student by student himself for 730 - FAIL", () => {
 		return course1.markAttendance(students.first, {
 			from: students.first
@@ -520,6 +535,28 @@ contract("Manager", accounts => {
 				assert((88).toString() === val[0].toString());
 				assert((77).toString() === val[1].toString());
 				assert((3).toString() === val[2].toString());
+			})
+			.catch(err => {
+				throw err;
+			})
+	});
+
+	it("kill(rollCount) by others should FAIL", () => {
+		return Manager.deployed()
+			.then((instance) => instance.kill({
+				from: students.first
+			}))
+			.catch(err => {
+				assert(err instanceof Error);
+			})
+	});
+	it("kill(rollCount) by admin should OK", () => {
+		return Manager.deployed()
+			.then((instance) => instance.kill({
+				from: owner 
+			}))
+			.then((val) => {
+				console.log(val);
 			})
 			.catch(err => {
 				throw err;

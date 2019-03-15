@@ -151,9 +151,9 @@ contract Course {
 
 	// TODO: Should admins be allowed access?
 	modifier accessToInstructors {
-		bool isAdmin = (msg.sender == admin);
+		//bool isAdmin = (msg.sender == admin);
 		bool isInstructor = (msg.sender == instructor);
-		require(isAdmin || isInstructor);
+		require(isInstructor);
 		_;
 	}
 	modifier accessToManagerContract {
