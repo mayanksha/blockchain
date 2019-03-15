@@ -19,12 +19,12 @@ contract Manager {
 	}
 
 	// TODO: Remove these later
-	function getAdmin() public accessToAll returns (address) {
-		return admin;
-	}
-	function getCourseAddress(int courseNo) public accessToAll returns (address) {
-		return address(course[courseNo]);
-	}
+	//function getAdmin() public accessToAll returns (address) {
+		//return admin;
+	//}
+	//function getCourseAddress(int courseNo) public accessToAll returns (address) {
+		//return address(course[courseNo]);
+	//}
 
 	// function
 	function kill() public accessToAdminOnly {
