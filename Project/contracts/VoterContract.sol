@@ -15,14 +15,12 @@ contract Voter {
     // Maybe we can swap it later for Hall of Residence for our case?
     //string public ElectoralConstituency;
     string public HallOfResidence;
-
     string public RollNumber;
 
     // Dunno how we're gonna store the hash of the fingerprint
     // This is allowed to be modified only is the sender.msg is Manager 
     address private BiometricData;
 
-    // TODO: 1. set head of EC 
     constructor(
         address _personAddr,
         string _Name,
