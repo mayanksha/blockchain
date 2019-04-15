@@ -1,123 +1,140 @@
 pragma solidity ^0.5.1;
+import "./CandidateContract.sol"
+import "./VoterContract.sol"
+import "./VoteTallyContract.sol"
 
 contract Manager {
-  address public owner;
-  //mapping (address => )
+    address public owner;
+    //mapping (address => )
 
-  // TODO: 1. set head of EC 
-  constructor() public {
-    owner = msg.sender;
-  }
+    // TODO: 1. set head of EC 
+    constructor() public {
+        owner = msg.sender;
+    }
 
-	function createVoter() public accessModifier {
-		//Anyone on the network can become a student if not one already
-		//Remember to assign the new student a unique roll number
+    function createVoter(
+        address personAddr,
+        string Name,
+        string FathersName,
+        string MothersName,
+        string HallOfResidence;
+        string RollNumber,
+    ) public accessModifier {
+        //Anyone on the network can become a student if not one already
+        //Remember to assign the new student a unique roll number
+        Voter newVoter = new Voter(
+            msg.sender,
+            kccName,
+            FathersName,
+            MothersName,
+            HallOfResidence;
+            RollNumber
+        )
+    }
 
-	}
+    function getVoterDetails() public PersonAndECOnly {
+        
+    }
 
-  function getVoterDetails() public {
+    function updateVotersDetails() public ECOnly {
 
-  }
+    }
 
-  function updateVotersDetails() public {
+    function registerFingerprintData() public {
 
-  }
+    }
 
-  function registerFingerprintData() public {
+    function updateFingerprintData() public {
 
-  }
+    }
 
-  function updateFingerprintData() public {
+    function createCandidate() public {
 
-  }
+    }
 
-  function createCandidate() public {
+    function updateCandidateDetails() public {
 
-  }
+    }
 
-  function updateCandidateDetails() public {
+    function castVote() {
 
-  }
-   
-  function castVote() {
+    }
 
-  }
+    function countVotes() {
 
-  function countVotes() {
+    }
 
-  }
+    function verifyVotes() {
 
-  function verifyVotes() {
+    }
 
-  }
+    function getCandidatePenalties() {
 
-  function getCandidatePenalties() {
+    }
 
-  }
+    // Should this function be moved to CandidateContract?
+    function getCandidateManifesto() {
 
-  // Should this function be moved to CandidateContract?
-  function getCandidateManifesto() {
+    }
 
-  }
+    function penalizeCandiate() {
 
-  function penalizeCandiate() {
+    }
 
-  }
+    function dismissCandidateNomination() {
 
-  function dismissCandidateNomination() {
+    }
 
-  }
+    function addProposerForCandidate() {
 
-  function addProposerForCandidate() {
+    }
 
-  }
+    function addSeconderForCandidate() {
 
-  function addSeconderForCandidate() {
+    }
 
-  }
+    function verifyProposerIsValidPerson() {
 
-  function verifyProposerIsValidPerson() {
+    }
 
-  }
+    function verifySeconderIsValidPerson() {
 
-  function verifySeconderIsValidPerson() {
+    }
 
-  }
+    // Change the owner to a new head of EC
+    function transferOwnership() {
 
-  // Change the owner to a new head of EC
-  function transferOwnership() {
+    }
 
-  }
+    function registerVoteCastingComputer() public {
 
-  function registerVoteCastingComputer() public {
+    }
 
-  }
+    // All the access modifiers here
+    modifier accessToAdminOnly {
+        require(msg.sender == admin);
+        _;
+    }
 
-  // All the access modifiers here
-	modifier accessToAdminOnly {
-		require(msg.sender == admin);
-		_;
-	}
+    modifier accessToVoterOnly {
 
-  modifier accessToVoterOnly {
+    }
 
-  }
+    modifier accessToCandidateOnly {
 
-  modifier accessToCandidateOnly {
+    }
 
-  }
+    modifier accessToHeadOnly {
 
-  modifier accessToHeadOnly {
+    }
 
-  }
+    modifier accessToRegisteredComputersOnly {
 
-  modifier accessToRegisteredComputersOnly {
-    
-  }
+    }
 
-  // Should have access only to register people, and update their details
-  // upon their fingerprint verification
-  modifier accessToECWorkersOnly {
+    // Should have access only to register people, and update their details
+    // upon their fingerprint verification
+    modifier accessToECWorkersOnly {
 
-  }
+    }
 }
