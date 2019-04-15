@@ -1,4 +1,4 @@
-pragma solidity ^0.5.1;
+pragma solidity ^0.5.0;
 import "./CandidateContract.sol";
 import "./VoterContract.sol";
 import "./VoteTallyContract.sol";
@@ -12,12 +12,12 @@ contract Manager {
         CAN_CREATE,
         CAN_CAST_VOTE,
         ALL_PRIVILEGES
-    };
+    }
 
     // Mapping between the RollNo and Voter
-    mapping (int256 => Voter) addressVoterMap;
+    mapping (address => Voter) addressVoterMap;
     // Mapping between wallet of user and Voter
-    mapping (address => Voter) rollNoVoterMap;
+    mapping (uint256 => Voter) rollNoVoterMap;
 
     // Mapping from person's address to enum AUTH_LEVELS
     mapping (address => int16) public ECAuthorisedPeople;
@@ -32,12 +32,13 @@ contract Manager {
 
     function createVoter(
         address personAddr,
-        string Name,
-        string FathersName,
-        string MothersName,
-        string HallOfResidence;
-        string RollNumber
-    ) public accessModifier {
+        string memory Name,
+        string memory FathersName,
+        string memory MothersName,
+        string memory HallOfResidence,
+        uint256 RollNumber,
+        int DOBTimestamp
+    ) public {
         //Anyone on the network can become a Voter if not one already
 
 		require (rollNoVoterMap[RollNumber] == Voter(0));
@@ -47,21 +48,22 @@ contract Manager {
             Name,
             FathersName,
             MothersName,
-            HallOfResidence;
-            RollNumber
+            HallOfResidence,
+            RollNumber,
+            DOBTimestamp
         );
     }
 
-    function getVoterDetails(int256 RollNo) public returns Voter {
+    function getVoterDetails(uint256 RollNo) public returns (Voter) {
 
         // Can be the address of the Voter or of someone within EC with adequate privileges
         address personAddr = msg.sender;
         
         // In the case the person provides some RollNo, you gotta check his Roll No
-        if (!RollNo) {
+        if (RollNo == 0) {
             //  Check that the person has actually registered as a voter or not
             require (addressVoterMap[personAddr] != Voter(0));
-            return addressVoterMap[personAddr].getAllDetails();
+            return addressVoterMap[personAddr].getSelfContract();
         }
 
         // This case will happen when this fn is called by someone from EC
@@ -69,41 +71,41 @@ contract Manager {
             // Check Auth level
             require (
                 ECAuthorisedPeople[personAddr] != 0 && 
-                ECAuthorisedPeople[personAddr] >= AUTH_LEVELS.CAN_VIEW
+                ECAuthorisedPeople[personAddr] >= (int16)( AUTH_LEVELS.CAN_VIEW )
             );
             // Check RollNo exists as Voter or not
-            require (rollNoVoterMap[RollNo]  Voter(0));
-            return rollNoVoterMap[RollNo].getAllDetails();
+            require (rollNoVoterMap[RollNo] !=  Voter(0));
+            return rollNoVoterMap[RollNo].getSelfContract();
         }
     }
 
     // Roll No is immutable?
-    function updateVotersDetails() public ECOnly {
-        // TODO: Finish this
+    //function updateVotersDetails(int256 RollNo) public {
+        //// TODO: Finish this
 
-        // Can be the address of the Voter or of someone within EC with adequate privileges
-        address personAddr = msg.sender;
+        //// Can be the address of the Voter or of someone within EC with adequate privileges
+        //address personAddr = msg.sender;
         
-        // In the case the person provides some RollNo, you gotta check his Roll No
-        if (!RollNo) {
-            //  Check that the person has actually registered as a voter or not
-            require (addressVoterMap[personAddr] != Voter(0));
-            return addressVoterMap[personAddr].updateAllDetails();
-        }
+        //// In the case the person provides some RollNo, you gotta check his Roll No
+        //if (!RollNo) {
+            ////  Check that the person has actually registered as a voter or not
+            //require (addressVoterMap[personAddr] != Voter(0));
+            //addressVoterMap[personAddr].updateAllDetails();
+        //}
 
-        // This case will happen when this fn is called by someone from EC
-        else {
-            // Check Auth level
-            require (
-                ECAuthorisedPeople[personAddr] != 0 && 
-                ECAuthorisedPeople[personAddr] >= AUTH_LEVELS.CAN_VIEW
-            );
-            // Check RollNo exists as Voter or not
-            require (rollNoVoterMap[RollNo]  Voter(0));
-            return rollNoVoterMap[RollNo].getAllDetails();
-        }
+        //// This case will happen when this fn is called by someone from EC
+        //else {
+            //// Check Auth level
+            //require (
+                //ECAuthorisedPeople[personAddr] != 0 && 
+                //ECAuthorisedPeople[personAddr] >= AUTH_LEVELS.CAN_VIEW
+            //);
+            //// Check RollNo exists as Voter or not
+            //require (rollNoVoterMap[RollNo]  != Voter(0));
+            //rollNoVoterMap[RollNo].getSelfContract();
+        //}
         
-    }
+    //}
 
     function registerFingerprintData() public {
 
@@ -121,53 +123,53 @@ contract Manager {
 
     }
 
-    function castVote() {
+    function castVote() public {
 
     }
 
-    function countVotes() {
+    function countVotes() public {
 
     }
 
-    function verifyVotes() {
+    function verifyVotes() public {
 
     }
 
-    function getCandidatePenalties() {
+    function getCandidatePenalties() public {
 
     }
 
     // Should this function be moved to CandidateContract?
-    function getCandidateManifesto() {
+    function getCandidateManifesto() public {
 
     }
 
-    function penalizeCandiate() {
+    function penalizeCandiate() public {
 
     }
 
-    function dismissCandidateNomination() {
+    function dismissCandidateNomination() public {
 
     }
 
-    function addProposerForCandidate() {
+    function addProposerForCandidate() public {
 
     }
 
-    function addSeconderForCandidate() {
+    function addSeconderForCandidate() public {
 
     }
 
-    function verifyProposerIsValidPerson() {
+    function verifyProposerIsValidPerson() public {
 
     }
 
-    function verifySeconderIsValidPerson() {
+    function verifySeconderIsValidPerson() public {
 
     }
 
     // Change the owner to a new head of EC
-    function transferOwnership() {
+    function transferOwnership() public {
 
     }
 
@@ -177,37 +179,37 @@ contract Manager {
 
     // All the access modifiers here
     modifier accessToAdminOnly {
-        require(msg.sender == admin);
+        require(msg.sender == owner);
         _;
     }
 
-    modifier accessToVoterOnly {
+    //modifier accessToVoterOnly {
 
-    }
+    //}
 
-    modifier accessToCandidateOnly {
+    //modifier accessToCandidateOnly {
 
-    }
+    //}
 
-    modifier accessToHeadOnly {
+    //modifier accessToHeadOnly {
 
-    }
+    //}
 
-    modifier accessToRegisteredComputersOnly {
+    //modifier accessToRegisteredComputersOnly {
 
-    }
+    //}
 
-    // Should have access only to register people, and update their details
-    // upon their fingerprint verification
-    modifier accessToECWorkersOnly {
+    //// Should have access only to register people, and update their details
+    //// upon their fingerprint verification
+    //modifier accessToECWorkersOnly {
         
-    }
-    modifier PersonAndECOnly {
+    //}
+    //modifier PersonAndECOnly {
   
-    }
+    //}
 	function kill() public accessToAdminOnly {
-		//The admin has the right to kill the contract at any time.
+		//The owner has the right to kill the contract at any time.
 		//Take care that no one else is able to kill the contract
-		selfdestruct((address)((uint160)(admin)));
+		selfdestruct((address)((uint160)(owner)));
 	}
 }

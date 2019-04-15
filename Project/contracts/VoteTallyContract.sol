@@ -1,22 +1,22 @@
-pragma solidity ^0.5.1;
+pragma solidity ^0.5.0;
 
 contract VoteTally {
-  address public owner;
+    address public owner;
 
-  constructor() public {
-    owner = msg.sender;
-  }
+    constructor() public {
+        owner = msg.sender;
+    }
 
-  mapping (address => uint) votes;
+    mapping (address => uint) votes;
 
-  function addVote(address addressOfCandidate) private {
-  	require (msg.sender == owner)
-  		votes[addressOfCandidate] = votes[addressOfCandidate] + 1;
-  }
+    function addVote(address addressOfCandidate) private {
+        require (msg.sender == owner);
+        votes[addressOfCandidate] = votes[addressOfCandidate] + 1;
+    }
 
-  function getVotesOfCandidate(address addressOfCandidate) private returns (uint) {
-  	require (msg.sender == owner)
-  		return votes[addressOfCandidate];
-  }
+    function getVotesOfCandidate(address addressOfCandidate) private returns (uint) {
+        require (msg.sender == owner);
+        return votes[addressOfCandidate];
+    }
 
 }

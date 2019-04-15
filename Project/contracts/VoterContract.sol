@@ -1,21 +1,21 @@
-pragma solidity ^0.5.1;
+pragma solidity ^0.5.0;
 
 contract Voter {
-    address private createdByECWorker;
+    address private ECAddressCreator;
     // Person whose Voter Contrac is being created
     address public owner;
     string public Name;
     string private PermanentAddress;
 
     // Stored as a timestamp
-    uint private DOB;
+    int private DOB;
     string private FathersName;
     string private MothersName;
 
     // Maybe we can swap it later for Hall of Residence for our case?
     //string public ElectoralConstituency;
     string public HallOfResidence;
-    string public RollNumber;
+    uint256 RollNumber;
 
     // Dunno how we're gonna store the hash of the fingerprint
     // This is allowed to be modified only is the sender.msg is Manager 
@@ -23,15 +23,15 @@ contract Voter {
 
     constructor(
         address _personAddr,
-        string _Name,
-        string _FathersName,
-        string _MothersName,
-        string _HallOfResidence,
-        string _RollNumber,
-        uint _DOB
+        string memory _Name,
+        string memory _FathersName,
+        string memory _MothersName,
+        string memory _HallOfResidence,
+        uint256 _RollNumber,
+        int _DOB
     ) public {
-        createdByECWorker = msg.sender;
-        owner =  _personAddrs;
+        ECAddressCreator = msg.sender;
+        owner =  _personAddr;
         Name = _Name;
         FathersName = _FathersName;
         MothersName = _MothersName;
@@ -40,9 +40,13 @@ contract Voter {
         DOB = _DOB;
     }
 
-    function viewMyDetails() public returns (address, string, string, string, string, string, uint) {
-        require (msg.sender == owner)
-            return (owner, FathersName, MothersName, HallOfResidence, RollNumber, DOB);
+    function viewMyDetails() public returns (address, string memory, string memory, string memory, string memory, uint256, int) {
+        require (msg.sender == owner);
+        return (owner, Name, FathersName, MothersName, HallOfResidence, RollNumber, DOB);
     }
 
+    function getSelfContract() public returns (Voter) {
+        require (msg.sender == owner || msg.sender == ECAddressCreator);
+        return Voter(address(this));
+    }
 }
