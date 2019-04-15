@@ -1,7 +1,7 @@
 pragma solidity ^0.5.1;
-import "./CandidateContract.sol"
-import "./VoterContract.sol"
-import "./VoteTallyContract.sol"
+import "./CandidateContract.sol";
+import "./VoterContract.sol";
+import "./VoteTallyContract.sol";
 
 contract Manager {
     address public owner;

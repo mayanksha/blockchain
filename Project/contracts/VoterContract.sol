@@ -4,19 +4,6 @@ contract Voter {
     address private createdByECWorker;
     // Person whose Voter Contrac is being created
     address public owner;
-
-    // TODO: 1. set head of EC 
-    constructor(
-        address personAddr,
-        string Name,
-        string FathersName,
-        string MothersName,
-        string HallOfResidence;
-        string RollNumber,
-    ) public {
-        owner = msg.sender;
-    }
-
     string public Name;
     string private PermanentAddress;
 
@@ -34,5 +21,30 @@ contract Voter {
     // Dunno how we're gonna store the hash of the fingerprint
     // This is allowed to be modified only is the sender.msg is Manager 
     address private BiometricData;
+
+    // TODO: 1. set head of EC 
+    constructor(
+        address _personAddr,
+        string _Name,
+        string _FathersName,
+        string _MothersName,
+        string _HallOfResidence,
+        string _RollNumber,
+        uint _DOB
+    ) public {
+        createdByECWorker = msg.sender;
+        owner =  _personAddrs;
+        Name = _Name;
+        FathersName = _FathersName;
+        MothersName = _MothersName;
+        HallOfResidence = _HallOfResidence;
+        RollNumber = _RollNumber;
+        DOB = _DOB;
+    }
+
+    function viewMyDetails() public returns (address, string, string, string, string, string, uint) {
+        require (msg.sender == owner)
+            return (owner, FathersName, MothersName, HallOfResidence, RollNumber, DOB);
+    }
 
 }
