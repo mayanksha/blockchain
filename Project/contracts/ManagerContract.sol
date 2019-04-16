@@ -5,12 +5,15 @@ import "./VoteTallyContract.sol";
 
 contract Manager {
     address public owner;
+    address voteTallyAddress;
 
     enum AUTH_LEVELS {
         NO_PRIVILEGE,
-        CAN_VIEW,
-        CAN_CREATE,
         CAN_CAST_VOTE,
+        CAN_VIEW,
+        CAN_CREATE_VOTER,
+        CAN_CREATE_CANDIDATE,
+        CAN_TRANSFER_OWNERSHIP,
         ALL_PRIVILEGES
     }
 
@@ -18,6 +21,12 @@ contract Manager {
     mapping (address => Voter) addressVoterMap;
     // Mapping between wallet of user and Voter
     mapping (uint256 => Voter) rollNoVoterMap;
+
+    mapping (address => bool) voteTracker;
+
+    // Mapping between the RollNo and Candidate 
+    mapping (address => Candidate) candidateMap;
+    address[] allCandidatesAddress;
 
     // Mapping from person's address to enum AUTH_LEVELS
     mapping (address => int16) public ECAuthorisedPeople;
@@ -27,7 +36,9 @@ contract Manager {
     // TODO: 1. set head of EC 
     constructor() public {
         owner = msg.sender;
-        VoteTally newTallyContract = new VoteTally();
+        ECAuthorisedPeople[owner] = (int16) (AUTH_LEVELS.ALL_PRIVILEGES);
+        VoteTally newTallyContract = new VoteTally(owner);
+        voteTallyAddress = newTallyContract.getSelfAddress();
     }
 
     function createVoter(
@@ -41,7 +52,7 @@ contract Manager {
     ) public {
         //Anyone on the network can become a Voter if not one already
 
-		require (rollNoVoterMap[RollNumber] == Voter(0));
+        require (rollNoVoterMap[RollNumber] == Voter(0));
 
         Voter newVoter = new Voter(
             msg.sender,
@@ -58,7 +69,7 @@ contract Manager {
 
         // Can be the address of the Voter or of someone within EC with adequate privileges
         address personAddr = msg.sender;
-        
+
         // In the case the person provides some RollNo, you gotta check his Roll No
         if (RollNo == 0) {
             //  Check that the person has actually registered as a voter or not
@@ -81,30 +92,30 @@ contract Manager {
 
     // Roll No is immutable?
     //function updateVotersDetails(int256 RollNo) public {
-        //// TODO: Finish this
+    //// TODO: Finish this
 
-        //// Can be the address of the Voter or of someone within EC with adequate privileges
-        //address personAddr = msg.sender;
-        
-        //// In the case the person provides some RollNo, you gotta check his Roll No
-        //if (!RollNo) {
-            ////  Check that the person has actually registered as a voter or not
-            //require (addressVoterMap[personAddr] != Voter(0));
-            //addressVoterMap[personAddr].updateAllDetails();
-        //}
+    //// Can be the address of the Voter or of someone within EC with adequate privileges
+    //address personAddr = msg.sender;
 
-        //// This case will happen when this fn is called by someone from EC
-        //else {
-            //// Check Auth level
-            //require (
-                //ECAuthorisedPeople[personAddr] != 0 && 
-                //ECAuthorisedPeople[personAddr] >= AUTH_LEVELS.CAN_VIEW
-            //);
-            //// Check RollNo exists as Voter or not
-            //require (rollNoVoterMap[RollNo]  != Voter(0));
-            //rollNoVoterMap[RollNo].getSelfContract();
-        //}
-        
+    //// In the case the person provides some RollNo, you gotta check his Roll No
+    //if (!RollNo) {
+    ////  Check that the person has actually registered as a voter or not
+    //require (addressVoterMap[personAddr] != Voter(0));
+    //addressVoterMap[personAddr].updateAllDetails();
+    //}
+
+    //// This case will happen when this fn is called by someone from EC
+    //else {
+    //// Check Auth level
+    //require (
+    //ECAuthorisedPeople[personAddr] != 0 && 
+    //ECAuthorisedPeople[personAddr] >= AUTH_LEVELS.CAN_VIEW
+    //);
+    //// Check RollNo exists as Voter or not
+    //require (rollNoVoterMap[RollNo]  != Voter(0));
+    //rollNoVoterMap[RollNo].getSelfContract();
+    //}
+
     //}
 
     function registerFingerprintData() public {
@@ -115,20 +126,63 @@ contract Manager {
 
     }
 
-    function createCandidate() public {
+    function createCandidate(
+        // The person who's being created as candidate
+        address personAddr,
+        address[] memory prop,
+        address[] memory sec,
+        string memory manifesto,
+        string memory credentials
+    ) public returns (bool) {
+        // The one accessing the contract
+        address accessor = msg.sender;
+        require(
+            ECAuthorisedPeople[accessor] == (int16)(AUTH_LEVELS.CAN_CREATE_CANDIDATE) || 
+            ECAuthorisedPeople[accessor] == (int16)(AUTH_LEVELS.ALL_PRIVILEGES)
+        );
+        require(candidateMap[personAddr] == Candidate( 0 ));
 
+        Candidate newCandidate = new Candidate(
+            personAddr,
+            prop,
+            sec,
+            manifesto,
+            credentials
+        );
+        address temp = newCandidate.getSelfAddress();
+
+        candidateMap[temp] = newCandidate;
+        allCandidatesAddress.push(temp);
+        return true;
     }
 
     function updateCandidateDetails() public {
 
     }
 
-    function castVote() public {
-
+    function castVote(address personAddr, address candidateAddr) public returns (bool) {
+        address accessor = msg.sender;
+        require(
+            ECAuthorisedPeople[accessor] == (int16)(AUTH_LEVELS.CAN_CREATE_CANDIDATE) || 
+            ECAuthorisedPeople[accessor] == (int16)(AUTH_LEVELS.ALL_PRIVILEGES)
+        );
+        require (addressVoterMap[personAddr] != Voter(0));
+        if (voteTracker[personAddr] == true) {
+            return false;
+        } else {
+            VoteTally VTInstance = VoteTally(voteTallyAddress);
+            bool temp = VTInstance.castVote(candidateAddr);
+            voteTracker[personAddr] == true;
+            return temp;
+        }
     }
 
-    function countVotes() public {
-
+    function countVotes(address candidateAddr) public returns (uint) {
+        address accessor = msg.sender;
+        // Allow only the head to count someone's votes
+        require(ECAuthorisedPeople[accessor] == (int16)(AUTH_LEVELS.ALL_PRIVILEGES));
+        VoteTally VTInstance = VoteTally(voteTallyAddress);
+        return VTInstance.getVotesOfCandidate(candidateAddr);
     }
 
     function verifyVotes() public {
@@ -202,14 +256,14 @@ contract Manager {
     //// Should have access only to register people, and update their details
     //// upon their fingerprint verification
     //modifier accessToECWorkersOnly {
-        
+
     //}
     //modifier PersonAndECOnly {
-  
+
     //}
-	function kill() public accessToAdminOnly {
-		//The owner has the right to kill the contract at any time.
-		//Take care that no one else is able to kill the contract
-		selfdestruct((address)((uint160)(owner)));
-	}
+    function kill() public accessToAdminOnly {
+        //The owner has the right to kill the contract at any time.
+        //Take care that no one else is able to kill the contract
+        selfdestruct((address)((uint160)(owner)));
+    }
 }

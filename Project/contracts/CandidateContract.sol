@@ -2,7 +2,7 @@ pragma solidity ^0.5.0;
 
 contract Candidate {
     address public owner;
-    address createdBy;
+    address ECAddressCreator;
 
     // Later conert then to arrays
     address[] proposers;
@@ -23,7 +23,7 @@ contract Candidate {
         string memory mani,
         string memory cred
     ) public {
-        createdBy = msg.sender;
+        ECAddressCreator = msg.sender;
         owner = personAddr;
         proposers = prop;
         seconders = sec;
@@ -57,4 +57,13 @@ contract Candidate {
         return string(babcde);
     }
 
+    function getSelfContract() public returns (Candidate) {
+        require (msg.sender == owner || msg.sender == ECAddressCreator);
+        return Candidate(address(this));
+    }
+    
+    function getSelfAddress() public returns (address) {
+        require (msg.sender == owner || msg.sender == ECAddressCreator);
+        return address(this);
+    }
 }

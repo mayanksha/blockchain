@@ -49,4 +49,9 @@ contract Voter {
         require (msg.sender == owner || msg.sender == ECAddressCreator);
         return Voter(address(this));
     }
+
+    function getSelfAddress() public returns (address) {
+        require (msg.sender == owner || msg.sender == ECAddressCreator);
+        return address(this);
+    }
 }
