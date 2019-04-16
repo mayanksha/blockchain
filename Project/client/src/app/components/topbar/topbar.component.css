@@ -1,0 +1,20 @@
+.topbar {
+  background: linear-gradient(
+    to right,
+    rgb(0, 0, 0),
+    rgb(37, 37, 37),
+    rgb(0, 0, 0)
+  );
+  color: white;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: +1000;
+}
+.mat-icon {
+	transform: scale(1.2);
+}
+.mat-raised-button {
+    margin: 8px;
+}

@@ -1,0 +1,45 @@
+<app-topbar></app-topbar>
+<mat-card>
+  <p>The available list of addresses</p>
+  <button mat-button color="primary" *ngFor="let addr of accounts" (click)="updateAddr(addr)">{{addr}}</button>
+</mat-card>
+<mat-card fxLayout="column" fxLayoutAlign="space-around center">
+  <mat-card fxFlex="30" *ngFor="let cand of allcand">
+    <p>
+    Name : {{cand.Name}}<br>
+    </p>
+    <p>
+    RollNo :  {{ cand.RollNo }} <br>
+    </p>
+    <p>
+    Manifesto: {{ cand.Manifesto }}
+    </p>
+    <p>
+    Candidate Contract Address: {{ cand.Address }}
+    </p>
+  </mat-card>
+</mat-card>
+<mat-card>
+  <form [formGroup]="form">
+    <mat-form-field>
+      <input matInput placeholder="Name of Candidate" formControlName="name">
+    </mat-form-field><br>
+    <mat-form-field>
+      <input matInput placeholder="Roll No." formControlName="rollNo">
+    </mat-form-field><br>
+    <mat-form-field>
+      <input matInput placeholder="Address Selected" formControlName="addr" [(value)]="selectedAddr">
+    </mat-form-field><br>
+
+    <mat-form-field>
+      <input matInput placeholder="Manifesto" formControlName="manifesto" [(value)]="mani">
+    </mat-form-field><br>
+
+    <mat-form-field>
+      <input matInput placeholder="Credentials" formControlName="credentials" [(value)]="cred">
+    </mat-form-field><br>
+  </form>  
+  <button mat-raised-button color="accent" (click)="createCandidate()">Create a Random Candidate</button>
+  <br>
+  <!--{{ form.value | json }}-->
+</mat-card>

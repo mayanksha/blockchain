@@ -6,7 +6,7 @@ import "./VoteTallyContract.sol";
 contract Manager {
     address public owner;
     address voteTallyAddress;
-
+    int temp;
     enum AUTH_LEVELS {
         NO_PRIVILEGE,
         CAN_CAST_VOTE,
@@ -17,12 +17,18 @@ contract Manager {
         ALL_PRIVILEGES
     }
 
+    enum VOTE_STATUS {
+        UNKNOWN,
+        NOT_CASTED,
+        CASTED
+    }
+
     // Mapping between the RollNo and Voter
     mapping (address => Voter) addressVoterMap;
     // Mapping between wallet of user and Voter
     mapping (uint256 => Voter) rollNoVoterMap;
 
-    mapping (address => bool) voteTracker;
+    mapping (address => uint) voteTracker;
 
     // Mapping between the RollNo and Candidate 
     mapping (address => Candidate) candidateMap;
@@ -47,22 +53,33 @@ contract Manager {
         string memory FathersName,
         string memory MothersName,
         string memory HallOfResidence,
-        uint256 RollNumber,
+        uint256 RollNo,
         int DOBTimestamp
-    ) public {
+    ) public returns (bool) {
         //Anyone on the network can become a Voter if not one already
+        address accessor = msg.sender;
+        require(
+            ECAuthorisedPeople[accessor] == (int16)(AUTH_LEVELS.CAN_CREATE_VOTER) || 
+            ECAuthorisedPeople[accessor] == (int16)(AUTH_LEVELS.ALL_PRIVILEGES)
+        );
 
-        require (rollNoVoterMap[RollNumber] == Voter(0));
+        if (rollNoVoterMap[RollNo] != Voter(0) || addressVoterMap[personAddr] != Voter(0))
+            require(false); 
 
         Voter newVoter = new Voter(
-            msg.sender,
+            personAddr,
             Name,
             FathersName,
             MothersName,
             HallOfResidence,
-            RollNumber,
+            RollNo,
             DOBTimestamp
         );
+        address temp = newVoter.getSelfAddress();
+        addressVoterMap[personAddr] = newVoter;
+        rollNoVoterMap[RollNo] = newVoter;
+        voteTracker[personAddr] = (uint) ( VOTE_STATUS.NOT_CASTED );
+        return true;
     }
 
     function getVoterDetails(uint256 RollNo) public returns (Voter) {
@@ -129,6 +146,8 @@ contract Manager {
     function createCandidate(
         // The person who's being created as candidate
         address personAddr,
+        string memory Name,
+        int RollNo,
         address[] memory prop,
         address[] memory sec,
         string memory manifesto,
@@ -144,6 +163,8 @@ contract Manager {
 
         Candidate newCandidate = new Candidate(
             personAddr,
+            Name,
+            RollNo,
             prop,
             sec,
             manifesto,
@@ -160,24 +181,36 @@ contract Manager {
 
     }
 
-    function castVote(address personAddr, address candidateAddr) public returns (bool) {
+    function setTemp(int _temp) public {
         address accessor = msg.sender;
         require(
             ECAuthorisedPeople[accessor] == (int16)(AUTH_LEVELS.CAN_CREATE_CANDIDATE) || 
             ECAuthorisedPeople[accessor] == (int16)(AUTH_LEVELS.ALL_PRIVILEGES)
         );
+        temp = _temp;
+    }
+
+    function getTemp() public returns (int) {
+        return temp;
+    }
+    function castVote(address personAddr, address candidateAddr) public returns (bool) {
+        address accessor = msg.sender;
+        require(
+            ECAuthorisedPeople[accessor] == (int16)(AUTH_LEVELS.CAN_CAST_VOTE) || 
+            ECAuthorisedPeople[accessor] == (int16)(AUTH_LEVELS.ALL_PRIVILEGES)
+        );
         require (addressVoterMap[personAddr] != Voter(0));
-        if (voteTracker[personAddr] == true) {
-            return false;
+        if (voteTracker[personAddr] != (uint)(VOTE_STATUS.NOT_CASTED)) {
+            return (false);
         } else {
             VoteTally VTInstance = VoteTally(voteTallyAddress);
             bool temp = VTInstance.castVote(candidateAddr);
-            voteTracker[personAddr] == true;
+            voteTracker[personAddr] = (uint)(VOTE_STATUS.CASTED);
             return temp;
         }
     }
 
-    function countVotes(address candidateAddr) public returns (uint) {
+    function countVotes(address candidateAddr) public view returns (uint) {
         address accessor = msg.sender;
         // Allow only the head to count someone's votes
         require(ECAuthorisedPeople[accessor] == (int16)(AUTH_LEVELS.ALL_PRIVILEGES));
@@ -189,6 +222,9 @@ contract Manager {
 
     }
 
+    function getAllCandidates() public view returns (address[] memory) {
+        return allCandidatesAddress;
+    }
     function getCandidatePenalties() public {
 
     }

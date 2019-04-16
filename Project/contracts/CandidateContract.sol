@@ -12,12 +12,17 @@ contract Candidate {
     string credentials;
     string[] penalties;
 
+    string Name;
+    int RollNo;
+
     struct penalty {
         uint32 fineAmount;
 
     }
     constructor(
         address personAddr,
+        string memory _Name,
+        int _r,
         address[] memory prop,
         address[] memory sec,
         string memory mani,
@@ -29,10 +34,18 @@ contract Candidate {
         seconders = sec;
         manifesto = mani;
         cred = credentials;
+        Name = _Name;
+        RollNo = _r;
     }
 
     function getManifesto() public view returns (string memory) {
         return manifesto;
+    }
+    function getName() public view returns (string memory) {
+        return Name;
+    }
+    function getRollNo() public view returns (int) {
+        return RollNo;
     }
     //function getSeconders() public view returns (string memory) {
         //string retVal = "";

@@ -12,7 +12,7 @@ contract VoteTally {
     mapping (address => uint) private votes;
 
     function castVote(address addressOfCandidate) public ManagerOnly returns (bool) {
-        if (votes[addressOfCandidate] <= 0) {
+        if (votes[addressOfCandidate] < 0) {
             return false;
         } else {
             votes[addressOfCandidate] = votes[addressOfCandidate] + 1;
@@ -21,14 +21,11 @@ contract VoteTally {
     }
 
     function getVotesOfCandidate(address addressOfCandidate) public view ManagerOnly returns (uint) {
-        return votes[addressOfCandidate] - 1;
+        return votes[addressOfCandidate];
     }
 
     function addCandidate(address addressOfCandidate) public ManagerOnly {
         require(votes[addressOfCandidate] == 0);
-
-        // 1 because 0 is the null value for mapping in solidity
-        votes[addressOfCandidate] = 1;
     }
 
     function getSelfContract() public view ManagerOnly returns (VoteTally) {

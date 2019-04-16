@@ -1,0 +1,11 @@
+.mat-card {
+    text-align: center;
+    margin: 10px;
+}
+.mat-form-field {
+    width: 80%;
+}
+
+/deep/ body {
+    margin-top: 100px !important;
+}

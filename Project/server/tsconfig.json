@@ -1,0 +1,43 @@
+{
+	"compilerOptions": {
+		"allowUnreachableCode": false,
+		"allowUnusedLabels": false,
+		"declaration": true,
+		"forceConsistentCasingInFileNames": true,
+		"module": "commonjs",
+		"noEmitOnError": true,
+		"noFallthroughCasesInSwitch": true,
+		"noImplicitReturns": true,
+		"pretty": true,
+		"sourceMap": true,
+		"strict": true,
+		"target": "es2017",
+		"outDir": "dist",                        
+		"strict": true,                           
+		"noImplicitAny": false,                 
+		"moduleResolution": "node",            
+		"esModuleInterop": true,
+		"rootDir": ".",
+		"outDir": "build",
+		"moduleResolution": "node",
+		"baseUrl": ".",
+    "paths": {
+      "typings/*": [
+        "src/typings/*"
+      ],
+      "models/*": [
+        "src/models/*"
+      ],
+      "*": [
+        "node_modules/*"
+      ]
+    }
+	},
+	"include" : [
+		"./**/*.ts",
+		"test/**/*.ts"
+	],
+	"exclude" : [
+		"node_modules"
+	]
+}

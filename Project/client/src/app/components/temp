@@ -1,0 +1,53 @@
+/*enum loginStatus {
+ *  NOT_TRIED = 0,
+ *  UNAUTHORIZED,
+ *  AUTHORIZED,
+ *  SERVER_ERROR,
+ *  BAD_REQUEST,
+ *  CRITICAL_ERROR
+ *};*/
+
+/*enum HTTP_RESPONSE_CODE {
+ *  UNAUTHORIZED = 401,
+ *  BAD_REQUEST = 400,
+ *  INTERNAL_SERVER_ERROR = 500,
+ *  NOT_IMPLEMENTED,
+ *  BAD_GATEWAY
+ *}*/
+
+/*onSubmit() {
+ *  console.log(this.form.value);
+ *  this.spinnerStatus = 1;
+ *  return this.http.post(this.postEndpoint + 'signin', this.form.value).toPromise().then(val => {
+ *    console.log(val);
+ *    this.status = loginStatus.AUTHORIZED;
+ *    setTimeout(() => this.spinnerStatus = 0, 1000);
+ *  })
+ *  .catch((err: HttpErrorResponse) => {
+ *    if (err.status === HTTP_RESPONSE_CODE.UNAUTHORIZED) {
+ *      this.status = loginStatus.UNAUTHORIZED                  
+ *    } else if (err.status === HTTP_RESPONSE_CODE.BAD_REQUEST) {
+ *      this.status = loginStatus.BAD_REQUEST                 
+ *    } else if (
+ *        err.status === HTTP_RESPONSE_CODE.INTERNAL_SERVER_ERROR || 
+ *        err.status === HTTP_RESPONSE_CODE.BAD_GATEWAY
+ *      ) {
+ *      this.status = loginStatus.SERVER_ERROR                 
+ *    } else {
+ *      this.status = loginStatus.CRITICAL_ERROR                 
+ *      console.error(err);
+ *    }
+ *    setTimeout(() => this.spinnerStatus = 0, 1000);
+ *  });
+ *}*/
+/*    this.form = this.fb.group({
+ *      email : ['', [ Validators.required,
+ *        Validators.email
+ *      ]],
+ *      password : ['', [ Validators.required ]],
+ *    });
+ *
+ *    setTimeout((): void => {
+ *      this.form.value.email = "msharma@iitk.ac.in";
+ *      this.form.value.password = "lskdjfl";
+ *    }, 1000);*/

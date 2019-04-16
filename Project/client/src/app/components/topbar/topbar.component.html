@@ -1,0 +1,13 @@
+<!-- <button mat-button [matMenuTriggerFor]="menu">Menu</button>
+   <mat-menu #menu="matMenu">
+     <button mat-menu-item>Item 1</button>
+     <button mat-menu-item>Item 2</button>
+   </mat-menu> -->
+<mat-toolbar class="topbar" fxLayout="row">
+  <a mat-raised-button routerLink="#" color="primary" >View Candidates</a>
+  <a mat-raised-button routerLink="/createCandidate" color="primary">Create Candidates</a>
+  <a mat-raised-button routerLink="#" color="primary">View Your Details (Voter)</a>
+  <a mat-raised-button routerLink="#" color="primary">Cast Vote (Voter)</a>
+  <a mat-raised-button routerLink="#" color="primary">View Casted Votes (AdminOnly)</a>
+
+</mat-toolbar>

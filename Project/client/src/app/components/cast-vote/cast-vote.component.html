@@ -1,0 +1,32 @@
+<app-topbar></app-topbar>
+<mat-card fxLayout="column" fxLayoutAlign="space-around center">
+<mat-card>
+  <form [formGroup]="form">
+    <mat-form-field>
+      <input matInput placeholder="Your Voter Address" formControlName="addr">
+    </mat-form-field><br>
+  </form>  
+  <!--<button mat-raised-button color="accent" (click)="createCandidate()">Create a Random Candidate</button>-->
+  <br>
+  <!--{{ form.value | json }}-->
+</mat-card>
+  <mat-card fxFlex="30" *ngFor="let cand of allcand">
+    <p>
+    Name : {{cand.Name}}<br>
+    </p>
+    <p>
+    RollNo :  {{ cand.RollNo }} <br>
+    </p>
+    <p>
+    Manifesto: {{ cand.Manifesto }}
+    </p>
+    <p>
+    Candidate Contract Address: {{ cand.Address }}
+    </p>
+    <p>
+    <button mat-raised-button color="accent" (click)="castVote(cand.Address)" [disabled]="voteCasted">
+      Cast Vote 
+    </button>
+    </p>
+  </mat-card>
+</mat-card>
